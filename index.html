@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpringStudio — AI Creation Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --c:  #00d4aa;
+  --b:  #0ea5e9;
+  --p:  #a78bfa;
+  --bg: #04050a;
+  --bg2:#080a14;
+  --bg3:#0d0f1e;
+  --br: rgba(255,255,255,0.06);
+  --bra:rgba(0,212,170,0.18);
+  --tx: #eef2ff;
+  --txm:rgba(238,242,255,0.5);
+  --txd:rgba(238,242,255,0.28);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);overflow-x:hidden;line-height:1.6}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,170,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,170,0.025) 1px,transparent 1px);background-size:56px 56px;pointer-events:none;z-index:0}
+
+/* TYPOGRAPHY */
+.syne{font-family:'Syne',sans-serif}
+.mono{font-family:'DM Mono',monospace}
+.grad{background:linear-gradient(135deg,var(--c),var(--b));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.grad2{background:linear-gradient(135deg,var(--b),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.lbl{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--c)}
+
+/* GLASS */
+.glass{background:rgba(13,15,30,0.75);border:1px solid var(--br);backdrop-filter:blur(16px)}
+.glass-accent{background:rgba(0,212,170,0.05);border:1px solid var(--bra)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;text-decoration:none;transition:all .25s}
+.btn-p{background:linear-gradient(135deg,var(--c),var(--b));color:#000;font-weight:600}
+.btn-p:hover{opacity:.88;transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,212,170,0.28)}
+.btn-g{background:rgba(255,255,255,0.04);border:1px solid var(--br);color:var(--tx)}
+.btn-g:hover{border-color:var(--bra);color:var(--c);background:rgba(0,212,170,0.05)}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(4,5,10,0.82);backdrop-filter:blur(24px);border-bottom:1px solid var(--br)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.5px}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{color:var(--txm);text-decoration:none;font-size:14px;transition:color .2s}
+.nav-links a:hover{color:var(--tx)}
+.nav-cta{padding:8px 20px;font-size:14px}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;padding:120px 32px 80px}
+.hero-glow{position:absolute;width:900px;height:600px;background:radial-gradient(ellipse,rgba(0,212,170,0.1) 0%,rgba(14,165,233,0.05) 40%,transparent 70%);top:40%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.hero-glow2{position:absolute;width:600px;height:400px;background:radial-gradient(ellipse,rgba(167,139,250,0.06) 0%,transparent 70%);bottom:20%;right:10%;pointer-events:none}
+.hero-inner{position:relative;z-index:1;max-width:860px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:100px;background:rgba(0,212,170,0.08);border:1px solid rgba(0,212,170,0.2);margin-bottom:32px}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--c);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(52px,8vw,96px);font-weight:800;line-height:1;letter-spacing:-3px;margin-bottom:24px}
+.hero-sub{font-size:clamp(17px,2.5vw,21px);color:var(--txm);max-width:560px;margin:0 auto 40px;line-height:1.65}
+.hero-btns{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:72px}
+.hero-stats{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap}
+.stat-item{padding:20px 40px;text-align:center}
+.stat-item + .stat-item{border-left:1px solid var(--br)}
+.stat-num{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;line-height:1}
+.stat-lbl{font-size:13px;color:var(--txm);margin-top:4px}
+
+/* MARQUEE */
+.marquee-section{padding:48px 0;border-top:1px solid var(--br);border-bottom:1px solid var(--br);overflow:hidden;position:relative;z-index:1}
+.marquee-track{display:flex;width:max-content;animation:marquee 28s linear infinite}
+.marquee-track:hover{animation-play-state:paused}
+.brand-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 20px;margin:0 8px;border-radius:100px;background:rgba(255,255,255,0.03);border:1px solid var(--br);font-size:14px;font-weight:500;white-space:nowrap;color:var(--txm)}
+.brand-pill .dot{width:6px;height:6px;border-radius:50%}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* CATEGORIES */
+.section{padding:100px 32px;max-width:1200px;margin:0 auto;position:relative;z-index:1}
+.section-head{text-align:center;margin-bottom:64px}
+.section-head h2{font-family:'Syne',sans-serif;font-size:clamp(36px,5vw,54px);font-weight:800;line-height:1.1;letter-spacing:-1.5px;margin-top:16px}
+.section-head p{color:var(--txm);font-size:17px;max-width:500px;margin:16px auto 0}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.cat-card{padding:28px;border-radius:16px;transition:all .3s;cursor:default}
+.cat-card:hover{border-color:var(--bra);transform:translateY(-4px);box-shadow:0 24px 48px rgba(0,0,0,0.4)}
+.cat-icon{font-size:32px;margin-bottom:16px;display:block}
+.cat-card h3{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px}
+.cat-card p{font-size:14px;color:var(--txm);line-height:1.5;margin-bottom:16px}
+.cat-count{font-family:'DM Mono',monospace;font-size:12px;color:var(--c)}
+.cat-brands{display:flex;gap:4px;flex-wrap:wrap;margin-top:12px}
+.mini-pill{font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(0,212,170,0.08);color:var(--c);font-family:'DM Mono',monospace}
+
+/* FEATURES */
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:8px}
+@media(max-width:700px){.feat-grid{grid-template-columns:1fr}}
+.feat-card{padding:32px;border-radius:16px}
+.feat-num{font-family:'DM Mono',monospace;font-size:48px;font-weight:500;line-height:1;margin-bottom:12px}
+.feat-card h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:8px}
+.feat-card p{font-size:15px;color:var(--txm);line-height:1.6}
+
+/* HOW IT WORKS */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:8px}
+@media(max-width:700px){.steps{grid-template-columns:1fr}}
+.step{padding:32px;border-radius:16px;text-align:center}
+.step-num{font-family:'DM Mono',monospace;font-size:12px;color:var(--c);margin-bottom:20px;letter-spacing:2px}
+.step-icon{font-size:40px;margin-bottom:20px;display:block}
+.step h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:10px}
+.step p{font-size:14px;color:var(--txm);line-height:1.6}
+
+/* PRICING */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:800px){.pricing-grid{grid-template-columns:1fr}}
+.price-card{padding:36px;border-radius:20px;display:flex;flex-direction:column}
+.price-card.featured{border-color:rgba(0,212,170,0.35);background:linear-gradient(135deg,rgba(0,212,170,0.06),rgba(14,165,233,0.04));position:relative;overflow:hidden}
+.price-card.featured::before{content:'Most Popular';position:absolute;top:16px;right:-28px;background:linear-gradient(135deg,var(--c),var(--b));color:#000;font-size:11px;font-weight:700;padding:4px 40px;transform:rotate(45deg);font-family:'DM Mono',monospace;letter-spacing:1px}
+.price-badge{font-size:11px;font-family:'DM Mono',monospace;color:var(--c);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px}
+.price-card h3{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:8px}
+.price-card p{font-size:14px;color:var(--txm);margin-bottom:28px;line-height:1.5}
+.price-val{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;line-height:1;margin-bottom:4px}
+.price-sub{font-size:13px;color:var(--txm);margin-bottom:32px}
+.price-features{list-style:none;margin-bottom:36px;flex:1}
+.price-features li{font-size:14px;color:var(--txm);padding:8px 0;border-bottom:1px solid var(--br);display:flex;align-items:center;gap:10px}
+.price-features li::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--c);flex-shrink:0}
+
+/* TERMINAL / UI PREVIEW */
+.ui-preview{border-radius:20px;overflow:hidden;border:1px solid var(--br)}
+.ui-bar{background:var(--bg3);padding:12px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--br)}
+.ui-dot{width:10px;height:10px;border-radius:50%}
+.ui-title{font-family:'DM Mono',monospace;font-size:12px;color:var(--txd);margin-left:8px}
+.ui-body{background:var(--bg2);padding:20px;display:grid;grid-template-columns:1fr 2fr;gap:16px;min-height:220px}
+.ui-sidebar{display:flex;flex-direction:column;gap:6px}
+.ui-module{padding:8px 12px;border-radius:8px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;transition:.2s}
+.ui-module.active{background:rgba(0,212,170,0.12);color:var(--c);border:1px solid rgba(0,212,170,0.2)}
+.ui-module:not(.active){color:var(--txd);border:1px solid transparent}
+.ui-module:not(.active):hover{color:var(--txm)}
+.ui-main{background:rgba(4,5,10,0.6);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.ui-label{font-size:10px;font-family:'DM Mono',monospace;color:var(--txd);letter-spacing:2px;text-transform:uppercase}
+.ui-field{background:rgba(255,255,255,0.03);border:1px solid var(--br);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--txm);font-family:'DM Mono',monospace}
+.ui-btn{display:inline-block;padding:8px 20px;border-radius:6px;background:linear-gradient(135deg,var(--c),var(--b));color:#000;font-size:12px;font-weight:700;font-family:'DM Mono',monospace;width:fit-content;margin-top:4px}
+.ui-status{font-size:11px;color:var(--c);font-family:'DM Mono',monospace;display:flex;align-items:center;gap:6px}
+.ui-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--c);animation:pulse 2s infinite}
+
+/* FOOTER */
+footer{border-top:1px solid var(--br);padding:60px 32px 40px;position:relative;z-index:1}
+.footer-inner{max-width:1200px;margin:0 auto}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
+@media(max-width:800px){.footer-top{grid-template-columns:1fr 1fr}}
+.footer-logo{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:12px}
+.footer-desc{font-size:14px;color:var(--txm);line-height:1.6;max-width:280px}
+.footer-col h4{font-size:13px;font-weight:600;margin-bottom:16px;color:var(--txm);letter-spacing:0.5px}
+.footer-col a{display:block;font-size:14px;color:var(--txd);text-decoration:none;margin-bottom:10px;transition:color .2s}
+.footer-col a:hover{color:var(--c)}
+.footer-bottom{border-top:1px solid var(--br);padding-top:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-bottom p{font-size:13px;color:var(--txd)}
+
+/* SECTION WRAPPER */
+.section-wrap{max-width:1200px;margin:0 auto;padding:100px 32px;position:relative;z-index:1}
+
+/* RESPONSIVE */
+@media(max-width:700px){
+  .nav-links{display:none}
+  .stat-item{padding:14px 20px}
+  .hero-stats{flex-direction:column}
+  .stat-item+.stat-item{border-left:none;border-top:1px solid var(--br)}
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(0,212,170,0.25);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo syne">
+      <span class="grad">Spring</span>Studio
+    </div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#modules">Modules</a>
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+    </div>
+    <a href="#" class="btn btn-p nav-cta">Download Beta</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      <span class="mono" style="font-size:12px;color:var(--c)">v1.0 — 268+ modules live</span>
+    </div>
+    <h1 class="syne">
+      One App.<br>
+      <span class="grad">Every AI Model.</span>
+    </h1>
+    <p class="hero-sub">SpringStudio brings 268+ cutting-edge AI modules into a single sleek desktop application. Generate images, videos, audio, and 3D — powered by the world's best APIs.</p>
+    <div class="hero-btns">
+      <a href="#" class="btn btn-p" style="font-size:16px;padding:14px 32px">
+        Download for Windows
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+      </a>
+      <a href="#modules" class="btn btn-g" style="font-size:16px;padding:14px 32px">Explore Modules</a>
+    </div>
+    <div class="glass hero-stats" style="display:inline-flex;border-radius:16px">
+      <div class="stat-item">
+        <div class="stat-num grad">268+</div>
+        <div class="stat-lbl">AI Modules</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" style="color:var(--b)">25+</div>
+        <div class="stat-lbl">AI Brands</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" style="color:var(--p)">8</div>
+        <div class="stat-lbl">Categories</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" style="color:var(--c)">2×</div>
+        <div class="stat-lbl">Transparent Pricing</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BRAND MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track">
+    <!-- Track repeated twice for seamless loop -->
+    <span class="brand-pill"><span class="dot" style="background:#FFD700"></span>Kling AI</span>
+    <span class="brand-pill"><span class="dot" style="background:#4285F4"></span>Google Veo 3.1</span>
+    <span class="brand-pill"><span class="dot" style="background:#FF4B4B"></span>Stability AI</span>
+    <span class="brand-pill"><span class="dot" style="background:#00C4FF"></span>FLUX</span>
+    <span class="brand-pill"><span class="dot" style="background:#FF6B35"></span>ElevenLabs</span>
+    <span class="brand-pill"><span class="dot" style="background:#7C3AED"></span>Runway</span>
+    <span class="brand-pill"><span class="dot" style="background:#10B981"></span>Ideogram</span>
+    <span class="brand-pill"><span class="dot" style="background:#F59E0B"></span>Luma AI</span>
+    <span class="brand-pill"><span class="dot" style="background:#3B82F6"></span>Minimax</span>
+    <span class="brand-pill"><span class="dot" style="background:#EC4899"></span>Bria AI</span>
+    <span class="brand-pill"><span class="dot" style="background:#14B8A6"></span>Meshy 3D</span>
+    <span class="brand-pill"><span class="dot" style="background:#8B5CF6"></span>xAI Grok</span>
+    <span class="brand-pill"><span class="dot" style="background:#06B6D4"></span>Qwen</span>
+    <span class="brand-pill"><span class="dot" style="background:#F97316"></span>Meta SAM</span>
+    <!-- Duplicate for seamless -->
+    <span class="brand-pill"><span class="dot" style="background:#FFD700"></span>Kling AI</span>
+    <span class="brand-pill"><span class="dot" style="background:#4285F4"></span>Google Veo 3.1</span>
+    <span class="brand-pill"><span class="dot" style="background:#FF4B4B"></span>Stability AI</span>
+    <span class="brand-pill"><span class="dot" style="background:#00C4FF"></span>FLUX</span>
+    <span class="brand-pill"><span class="dot" style="background:#FF6B35"></span>ElevenLabs</span>
+    <span class="brand-pill"><span class="dot" style="background:#7C3AED"></span>Runway</span>
+    <span class="brand-pill"><span class="dot" style="background:#10B981"></span>Ideogram</span>
+    <span class="brand-pill"><span class="dot" style="background:#F59E0B"></span>Luma AI</span>
+    <span class="brand-pill"><span class="dot" style="background:#3B82F6"></span>Minimax</span>
+    <span class="brand-pill"><span class="dot" style="background:#EC4899"></span>Bria AI</span>
+    <span class="brand-pill"><span class="dot" style="background:#14B8A6"></span>Meshy 3D</span>
+    <span class="brand-pill"><span class="dot" style="background:#8B5CF6"></span>xAI Grok</span>
+    <span class="brand-pill"><span class="dot" style="background:#06B6D4"></span>Qwen</span>
+    <span class="brand-pill"><span class="dot" style="background:#F97316"></span>Meta SAM</span>
+  </div>
+</div>
+
+<!-- MODULE CATEGORIES -->
+<div class="section-wrap" id="modules">
+  <div class="section-head">
+    <span class="lbl">268+ Modules</span>
+    <h2 class="syne">Every type of AI<br><span class="grad">creation covered</span></h2>
+    <p>From image generation to 3D models, SpringStudio handles the full creative pipeline.</p>
+  </div>
+  <div class="cat-grid">
+    <div class="cat-card glass">
+      <span class="cat-icon">🖼</span>
+      <h3 class="syne">Text to Image</h3>
+      <p>Generate stunning images from text prompts with the world's best models.</p>
+      <div class="cat-count">62 modules</div>
+      <div class="cat-brands"><span class="mini-pill">FLUX</span><span class="mini-pill">SDXL</span><span class="mini-pill">Ideogram</span><span class="mini-pill">Bria</span></div>
+    </div>
+    <div class="cat-card glass">
+      <span class="cat-icon">🎬</span>
+      <h3 class="syne">Text to Video</h3>
+      <p>Generate cinematic video clips from text with native audio support.</p>
+      <div class="cat-count">38 modules</div>
+      <div class="cat-brands"><span class="mini-pill">Kling</span><span class="mini-pill">Veo 3.1</span><span class="mini-pill">Minimax</span><span class="mini-pill">LTX</span></div>
+    </div>
+    <div class="cat-card glass">
+      <span class="cat-icon">🎞</span>
+      <h3 class="syne">Image to Video</h3>
+      <p>Animate any image into fluid motion with precise camera control.</p>
+      <div class="cat-count">55 modules</div>
+      <div class="cat-brands"><span class="mini-pill">Kling O3</span><span class="mini-pill">Veo 3.1</span><span class="mini-pill">Runway</span><span class="mini-pill">Luma</span></div>
+    </div>
+    <div class="cat-card glass">
+      <span class="cat-icon">✏️</span>
+      <h3 class="syne">Image Editing</h3>
+      <p>Inpainting, outpainting, style transfer, and intelligent edits.</p>
+      <div class="cat-count">48 modules</div>
+      <div class="cat-brands"><span class="mini-pill">FLUX Edit</span><span class="mini-pill">Gemini</span><span class="mini-pill">Luma</span><span class="mini-pill">Vidu</span></div>
+    </div>
+    <div class="cat-card glass">
+      <span class="cat-icon">🎵</span>
+      <h3 class="syne">Audio Generation</h3>
+      <p>Text-to-speech, voice cloning, music, and sound effects.</p>
+      <div class="cat-count">32 modules</div>
+      <div class="cat-brands"><span class="mini-pill">ElevenLabs</span><span class="mini-pill">Kling TTS</span><span class="mini-pill">Stability</span></div>
+    </div>
+    <div class="cat-card glass">
+      <span class="cat-icon">🎙</span>
+      <h3 class="syne">Audio Processing</h3>
+      <p>Transcription, noise reduction, separation, and enhancement.</p>
+      <div class="cat-count">18 modules</div>
+      <div class="cat-brands"><span class="mini-pill">Whisper</span><span class="mini-pill">DeepFilter</span><span class="mini-pill">SAM Audio</span></div>
+    </div>
+    <div class="cat-card glass">
+      <span class="cat-icon">🗿</span>
+      <h3 class="syne">3D Generation</h3>
+      <p>Create, retopologize, and texture 3D models from images or text.</p>
+      <div class="cat-count">12 modules</div>
+      <div class="cat-brands"><span class="mini-pill">Meshy</span><span class="mini-pill">Hunyuan</span><span class="mini-pill">SAM-3</span></div>
+    </div>
+    <div class="cat-card glass">
+      <span class="cat-icon">🔧</span>
+      <h3 class="syne">Utilities & Vision</h3>
+      <p>Background removal, upscaling, segmentation, and OCR tools.</p>
+      <div class="cat-count">24 modules</div>
+      <div class="cat-brands"><span class="mini-pill">RMBG</span><span class="mini-pill">ESRGAN</span><span class="mini-pill">Florence-2</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- UI PREVIEW + FEATURES -->
+<div class="section-wrap" id="features">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center">
+    <div>
+      <span class="lbl">Desktop Application</span>
+      <h2 class="syne" style="font-size:clamp(32px,4vw,48px);font-weight:800;line-height:1.1;letter-spacing:-1.5px;margin:16px 0 20px">Built for<br><span class="grad">creators, not coders</span></h2>
+      <p style="color:var(--txm);font-size:16px;line-height:1.7;margin-bottom:32px">Every module follows SpringStudio Standards — a consistent 4-tab interface, dark UI, one-click generation, and automatic file saving. No API keys to manage per-app, no switching between 10 browser tabs.</p>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">⚡</div>
+          <div>
+            <div style="font-weight:500;font-size:15px">Instant generation</div>
+            <div style="font-size:13px;color:var(--txm)">Queue-based API — submit and track in real time</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">📁</div>
+          <div>
+            <div style="font-weight:500;font-size:15px">Auto-save outputs</div>
+            <div style="font-size:13px;color:var(--txm)">All outputs saved to Documents/SpringStudio_Output automatically</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">📊</div>
+          <div>
+            <div style="font-weight:500;font-size:15px">200-item history per module</div>
+            <div style="font-size:13px;color:var(--txm)">Full generation history with metadata and stats</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- UI Preview mockup -->
+    <div class="ui-preview">
+      <div class="ui-bar">
+        <div class="ui-dot" style="background:#ff5f57"></div>
+        <div class="ui-dot" style="background:#febc2e"></div>
+        <div class="ui-dot" style="background:#28c840"></div>
+        <span class="ui-title">SpringStudio — Kling v3 Pro T2V</span>
+      </div>
+      <div class="ui-body">
+        <div class="ui-sidebar">
+          <div class="ui-module active">✦ Generate</div>
+          <div class="ui-module">ℹ Info</div>
+          <div class="ui-module">⏱ History</div>
+          <div class="ui-module">📊 Stats</div>
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--br)">
+            <div style="font-size:10px;color:var(--txd);font-family:'DM Mono',monospace;margin-bottom:8px">MODULES</div>
+            <div class="ui-module" style="font-size:11px;color:var(--txd)">Kling v3 Std T2V</div>
+            <div class="ui-module active" style="font-size:11px">Kling v3 Pro T2V</div>
+            <div class="ui-module" style="font-size:11px;color:var(--txd)">Kling v2.6 Pro I2V</div>
+          </div>
+        </div>
+        <div class="ui-main">
+          <div class="ui-label">Prompt</div>
+          <div class="ui-field">Cinematic drone shot through ancient ruins at golden hour...</div>
+          <div class="ui-label" style="margin-top:4px">Duration</div>
+          <div class="ui-field">10s</div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div class="ui-btn">Generate →</div>
+            <div class="ui-status">Ready</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NUMBERS -->
+<div class="section-wrap">
+  <div class="feat-grid">
+    <div class="feat-card glass-accent" style="border-radius:20px">
+      <div class="feat-num grad">268+</div>
+      <h3 class="syne">AI Modules</h3>
+      <p>The largest collection of AI creative tools in a single desktop app — and growing every week.</p>
+    </div>
+    <div class="feat-card glass-accent" style="border-radius:20px">
+      <div class="feat-num grad2">25+</div>
+      <h3 class="syne">AI Brands</h3>
+      <p>Kling, Veo, Stability, FLUX, ElevenLabs, Runway, Ideogram, Luma, Grok and more — all in one place.</p>
+    </div>
+    <div class="feat-card glass-accent" style="border-radius:20px">
+      <div class="feat-num" style="color:var(--p)">2×</div>
+      <h3 class="syne">Transparent Pricing</h3>
+      <p>Simple 2x API rate markup. No hidden fees, no subscriptions. Pay only for what you generate.</p>
+    </div>
+    <div class="feat-card glass-accent" style="border-radius:20px">
+      <div class="feat-num" style="color:var(--c)">∞</div>
+      <h3 class="syne">History & Stats</h3>
+      <p>200-item generation history per module, full metadata, cost tracking and generation analytics.</p>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="section-wrap" id="how">
+  <div class="section-head">
+    <span class="lbl">How It Works</span>
+    <h2 class="syne">Simple as <span class="grad">1, 2, 3</span></h2>
+    <p>From idea to creation in seconds — no technical setup required.</p>
+  </div>
+  <div class="steps">
+    <div class="step glass">
+      <div class="step-num">STEP 01</div>
+      <span class="step-icon">🎯</span>
+      <h3 class="syne">Pick a Module</h3>
+      <p>Browse 268+ modules organized by category. Text-to-Image, Text-to-Video, Audio, 3D — find exactly what you need.</p>
+    </div>
+    <div class="step glass">
+      <div class="step-num">STEP 02</div>
+      <span class="step-icon">✍️</span>
+      <h3 class="syne">Enter Your Prompt</h3>
+      <p>Write your creative prompt or upload reference images/videos. Adjust model settings with intuitive sliders and dropdowns.</p>
+    </div>
+    <div class="step glass">
+      <div class="step-num">STEP 03</div>
+      <span class="step-icon">✨</span>
+      <h3 class="syne">Generate & Save</h3>
+      <p>Hit Generate. SpringStudio queues your request, tracks progress in real time, and saves output automatically to your Documents folder.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<div class="section-wrap" id="pricing">
+  <div class="section-head">
+    <span class="lbl">Pricing</span>
+    <h2 class="syne">Pay for what <span class="grad">you actually use</span></h2>
+    <p>No monthly subscriptions. No seat limits. All 268+ modules included.</p>
+  </div>
+  <div class="pricing-grid">
+    <div class="price-card glass">
+      <div class="price-badge">Starter</div>
+      <h3 class="syne">Explorer</h3>
+      <p>Perfect for individuals exploring AI creative tools for the first time.</p>
+      <div class="price-val grad">$0</div>
+      <div class="price-sub">to download the app</div>
+      <ul class="price-features">
+        <li>All 268+ modules included</li>
+        <li>Pay per generation only</li>
+        <li>Full generation history</li>
+        <li>Auto-save to Documents</li>
+        <li>Windows desktop app</li>
+      </ul>
+      <a href="#" class="btn btn-g" style="width:100%;justify-content:center">Download Free</a>
+    </div>
+    <div class="price-card glass featured">
+      <div class="price-badge">Recommended</div>
+      <h3 class="syne">Creator</h3>
+      <p>For active creators who generate content daily across multiple categories.</p>
+      <div class="price-val" style="color:var(--c)">2×</div>
+      <div class="price-sub">API rate (transparent markup)</div>
+      <ul class="price-features">
+        <li>Everything in Explorer</li>
+        <li>Kling video generation</li>
+        <li>Google Veo 3.1 (4K)</li>
+        <li>ElevenLabs voice cloning</li>
+        <li>3D model generation</li>
+        <li>Priority queue access</li>
+      </ul>
+      <a href="#" class="btn btn-p" style="width:100%;justify-content:center">Get Started</a>
+    </div>
+    <div class="price-card glass">
+      <div class="price-badge">Enterprise</div>
+      <h3 class="syne">Studio</h3>
+      <p>For production studios and agencies with high-volume generation needs.</p>
+      <div class="price-val grad2">Custom</div>
+      <div class="price-sub">volume discounts available</div>
+      <ul class="price-features">
+        <li>Everything in Creator</li>
+        <li>Volume API pricing</li>
+        <li>Custom module development</li>
+        <li>Dedicated support</li>
+        <li>White-label options</li>
+      </ul>
+      <a href="#" class="btn btn-g" style="width:100%;justify-content:center">Contact Us</a>
+    </div>
+  </div>
+  <!-- Pricing note -->
+  <div style="text-align:center;margin-top:40px;padding:24px;border-radius:12px;background:rgba(0,212,170,0.04);border:1px solid rgba(0,212,170,0.12)">
+    <p style="font-size:14px;color:var(--txm)">
+      💡 <strong style="color:var(--tx)">How pricing works:</strong> SpringStudio charges 2× the underlying API rate. Example: Kling v3 Pro video at $0.168/sec API = $0.336/sec in SpringStudio. Full cost transparency — see exact pricing in every module's Info tab before generating.
+    </p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-logo syne"><span class="grad">Spring</span>Studio</div>
+        <p class="footer-desc">The all-in-one desktop AI creation suite. 268+ modules, 25+ brands, one application.</p>
+        <div style="margin-top:20px;display:flex;gap:12px">
+          <a href="#" style="width:36px;height:36px;border-radius:8px;background:var(--bg3);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;color:var(--txm);text-decoration:none;font-size:16px">𝕏</a>
+          <a href="#" style="width:36px;height:36px;border-radius:8px;background:var(--bg3);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;color:var(--txm);text-decoration:none;font-size:16px">📺</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <a href="#">Features</a>
+        <a href="#">Modules</a>
+        <a href="#">Pricing</a>
+        <a href="#">Changelog</a>
+        <a href="#">Roadmap</a>
+      </div>
+      <div class="footer-col">
+        <h4>Categories</h4>
+        <a href="#">Text to Image</a>
+        <a href="#">Text to Video</a>
+        <a href="#">Image to Video</a>
+        <a href="#">Audio</a>
+        <a href="#">3D Generation</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#">About</a>
+        <a href="#">Blog</a>
+        <a href="#">Contact</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 SpringStudio. Built on <a href="https://springstudio.ai" style="color:var(--c);text-decoration:none">springstudio.ai</a></p>
+      <p style="color:var(--txd);font-family:'DM Mono',monospace;font-size:12px">Powered by fal.ai APIs</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
