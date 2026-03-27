@@ -87,27 +87,3 @@ export async function getResultUrl(responseUrl: string): Promise<any> {
 }
 
 // ─── 4. Upload File to fal.ai Storage ───────────────
-export async function uploadFile(
-  fileBuffer: Buffer,
-  fileName: string,
-  contentType: string
-): Promise<string> {
-  const res = await fetch('https://rest.alpha.fal.ai/storage/upload', {
-    method: 'PUT',
-    headers: {
-      'Authorization': `Key ${FAL_KEY}`,
-      'Content-Type': contentType,
-      'X-File-Name': fileName,
-    },
-    body: fileBuffer,
-  })
-
-  if (!res.ok) {
-    const err = await res.text()
-    throw new Error(`Upload failed ${res.status}: ${err}`)
-  }
-
-  const data = await res.json()
-  console.log(`[fal:upload] ${fileName} → ${data.url}`)
-  return data.url
-}
